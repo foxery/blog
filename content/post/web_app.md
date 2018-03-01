@@ -8,7 +8,7 @@ tags:
 - webApp
 keywords:
 - webApp
-#thumbnailImage: //example.com/image.jpg
+thumbnailImage: /img/camera.jpg
 ---
 
 <!--more-->
