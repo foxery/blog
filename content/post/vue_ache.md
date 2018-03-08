@@ -128,9 +128,9 @@ export default {
 ```  
 
 2. 注册全局引用组件方法  
- 1). 引入组件
+    1). 引入组件
  `import Component from '' `  
- 2).导出方法
+    2).导出方法
 
  ``` javascript  
  const Toast = {};
@@ -162,10 +162,63 @@ Toast.install = function (Vue) {
 
 export default Toast
  ```  
-   3).在组件内无需import,直接`this.$toast("")`即可
+    
+    3).在`main.js`文件内引用  
+       `import Toast from ''`  
+       `Vue.use(Toast)`
+    4).在组件内无需import,直接`this.$toast("")`即可  
+  
+
+3. 只允许输入数字的组件  
+
+ ``` javascript 
+ <input type="text" v-number-only>  
+
+ export default{
+    directives: {
+        numberOnly: {
+            bind: function(el) {
+                el.handler = function() {
+                el.value = el.value.replace(/\D+/, "");
+                };
+                el.addEventListener("input", el.handler);
+            },
+            unbind: function(el) {
+                el.removeEventListener("input", el.handler);
+            }
+        }
+  }
+ }
+ ```   
 
 ### 记录
-1. http请求 
+1. http请求  
+
+配置路由文件`router/config.js`  
+
+``` javascript
+import axios from 'axios'
+
+var pName = location.pathname.replace(/\/+/g, '/');
+var id = pName.slice(0, pName.indexOf("/", 2));
+axios.defaults.baseURL = id;
+axios.defaults.withCredentials = true;
+
+axios.interceptors.request.use(function (config) {
+    return config;
+}, function (error) {
+    return Promise.reject(error);
+});//请求拦截器
+
+axios.interceptors.response.use(response => {
+    // 请求成功返回
+    //your code
+    return response;
+}, (responseError) => {
+});//响应拦截器
+```  
+在`main.js`文件中引入,`import config from './router/config'`  
+发布时切换生产环境,`Vue.config.productionTip = false`
 
 ``` javascript  
 import axios from 'axios'

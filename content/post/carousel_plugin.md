@@ -9,7 +9,7 @@ tags:
 - plugin
 keywords:
 - carousel
-thumbnailImage: /img/carousel.jpg
+thumbnailImage: /img/carousel.png
 ---
 
 <!--more-->  
