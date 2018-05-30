@@ -12,289 +12,341 @@ thumbnailImage: /img/cover2.jpg
 ---
 
 <!--more-->
-### 坑
-1. 路由去掉默认的#  
 
-        ```js
-        export default new Router({  
-        mode: 'history',//去掉路由中默认的#/  
-        routes: [
+<!-- toc -->
+
+# 1.关于路由模式问题
+    默认是hash模式，此模式下的路由会带有#/的形式;  
+    可将mode改成history，此时路由的#便会取消，但此模式需要后台配置  
+# 2.如何注册全局组件    
+{{< codeblock "toast.js" "js" "" "js" >}}import Component from '';
+
+const Toast = {};
+
+// 注册Toast
+Toast.install = function (Vue) {
+    // 生成一个Vue的子类
+    // 同时这个子类也就是组件
+    const ToastConstructor = Vue.extend(Component)
+    // 生成一个该子类的实例
+    const instance = new ToastConstructor();
+
+    // 将这个实例挂载在新创建的div上
+    // 并将此div加入全局挂载点内部
+    instance.$mount(document.createElement('div'))
+    document.body.appendChild(instance.$el)
+
+    // 通过Vue的原型注册一个方法
+    // 让所有实例共享这个方法 
+    Vue.prototype.$toast = (msg, duration = 1500) => {
+        instance.message = msg;
+        instance.visible = true;
+
+        setTimeout(() => {
+            instance.visible = false;
+        }, duration);
+    }
+}
+
+export default Toast;
+{{< /codeblock >}}
+{{< codeblock "main.js" "js" "" "js" >}}import Toast from ''
+Vue.use(Toast)
+{{< /codeblock >}}
+在组件内`this.$toast("")`即可  
+
+# 3.局部注册只允许输入数字的组件
+{{< codeblock "demo.vue" "js" "" "js" >}}<template>
+    <div>
+        <input type="text" v-number-only>
+    </div>
+</template>
+<script>
+    export default{
+        directives: {
+            numberOnly: {
+                bind: function(el) {
+                    el.handler = function() {
+                    el.value = el.value.replace(/\D+/, "");
+                    };
+                    el.addEventListener("input", el.handler);
+                },
+                unbind: function(el) {
+                    el.removeEventListener("input", el.handler);
+                }
+            }
+        }
+    }
+</script>
+{{< /codeblock >}}
+
+# 4.封装http请求
+{{< codeblock "http.js" "js" "" "js" >}}import axios from 'axios'
+import qs from 'qs'
+
+export function Get(url, data) {
+    return new Promise((resolve, reject) => {
+        axios.get(url, {
+            params: data
+        }).then((res) => {
+            if (res) {
+                if (res.status == 200) {
+                    resolve(res.data.data);
+                } else {
+                    reject(res);
+                }
+            }
+        }).catch((error) => {
+            reject(error);
+        })
+    });
+}
+
+export function Post(url, data) {
+    return new Promise((resolve, reject) => {
+        axios.post(url, qs.stringify(data), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
+            }
+        }).then((res) => {
+            if (res) {
+                if (res.status == 200) {
+                    resolve(res.data.data);
+                } else {
+                    reject(res);
+                }
+            }
+        }).catch((error) => {
+            reject(error);
+        })
+    });
+}
+
+export function PostFlie(url, data) {
+    return new Promise((resolve, reject) => {
+        //根据data对象生成FormData对象
+        var temp = new FormData();
+        for (var t in data) {
+            temp.append(t, data[t]);
+        }
+        axios.post(url, temp).then((res) => {
+            if (res.status == 200) {
+                resolve(res.data.data);
+            } else {
+                reject(res);
+            }
+        }).catch((error) => {
+            reject(error);
+        })
+    })
+}
+{{< /codeblock >}}
+{{< codeblock "service.js" "js" "" "js" >}}import { Get, Post,PostFlie } from './http'
+
+export function Interface(data) {
+    return Get('/url', data);
+}
+{{< /codeblock >}}
+{{< codeblock "demo.vue" "js" "" "js" >}}import { Interface } from "";
+
+export default{
+    mounted(){
+        Interface(data).then(res => {});
+    }
+}
+{{< /codeblock >}}
+
+# 5.如何使用sass
+  1. 安装sass的依赖包  
+
+        # 使用save会在package.json中自动添加  
+        cnpm i node-sass --save-dev
+        cnpm i sass-loader --save-dev  
+  2. 添加配置  
+        {{< codeblock "build/webpack.base.conf.js" "js" "" "js" >}}module: {
+        rules: [
+            //...默认及其他
             {
-            path: '/',
-            name: 'HelloWorld',
-            component: HelloWorld
+                test: /\.scss$/,
+                loaders: ["style", "css", "sass"]
             }
         ]
-        });
-        ```
-2. 组件中避免for循环时出现重复键报错,可在绑定key值时加一些字符区分  
+    }
+        {{< /codeblock >}}  
 
-        ```html
-        <template>
-            <div v-for="item in items" :key="item.Id+'aabbcc'">
-            </div>
-        </template>
-        ```  
+ 3. 使用  
 
-### 组件
-1. 简易下拉列表  
+         <style lang="scss">
+         </style>  
 
-        ```html
-        <template>
-        <div>
-            <div class="dropdown-wrapper">
-                <div class="dropdown-selected" :class="{ show: isActive }" @click="SetActive">{{selected.Name}}</div>
-                <ul class="dropdown-list">
-                    <li v-for="item in items" @click="SelectLi(item.Name)" :key="item.Id">{{item.Name}}</li>
-                </ul>
-            </div>
-        </div>
-        </template>
-        ```
+# 6.如何引用公共.scss文件
+  在`app.vue`中`@import ''`即可     
 
-        ```js
-        export default {
-        name: "",
-        data() {
-            return {
-            isActive: false,
-            selected: {
-                Id: 0,
-                Name: this.items[0].Name
+# 7.如何解决vue开发模式下的跨域问题
+| 接口请求地址 | 前端页面地址 |
+| ----------- | ----------- |
+| https://cnodejs.org/api/v1 | http://localhost:8080
+
+如上，在请求上，我们的开发环境不仅仅面临要把接口的全路径写全的问题，还包括跨域问题等等。
+
+所以要将接口地址通过代理的方式映射到本地，让我们的本地开发也可以使用相对根目录的方式请求接口。
+
+{{< codeblock "config/index.js" "js" "" "js" >}}proxyTable: {
+      '/apitest': { //跨域接口请求标记
+        target: 'https://cnodejs.org/api/v1', // 需要跨域请求接口的域名
+        secure: false,      // 如果是https接口，需要配置这个参数
+        changeOrigin: true,     // 如果接口跨域，需要进行这个参数配置
+        pathRewrite: { 
+          '^/apitest': '' //把域名换成target，代理域名为空，请注意，pathRewrite下的代理域名一定要设置为空，否则会出现请求接口404的问题
+          } 
+      }
+    }
+{{< /codeblock >}}
+{{< codeblock "build/webpack.dev.conf.js" "js" "" "js" >}}plugins: [
+    new webpack.DefinePlugin({
+      API_HOST:'"/apitest"' //设置全局变量 注意单双引号
+    })
+]
+{{< /codeblock >}}
+{{< codeblock "build/webpack.prod.conf.js" "js" "" "js" >}}plugins: [
+    new webpack.DefinePlugin({
+      API_HOST:'"https://cnodejs.org/api/v1"' //设置全局变量
+    })
+]
+{{< /codeblock >}}
+{{< codeblock "build/webpack.dev.build.conf.js" "js" "" "js" >}}plugins: [
+    new webpack.DefinePlugin({
+      API_HOST:'"https://cnodejs.org/api/v1"' //设置全局变量
+    })
+]
+{{< /codeblock >}}
+{{< codeblock "service.js" "js" "" "js" >}}export function Interface(data) {
+    return Get(API_HOST + '/topics', data);
+}
+{{< /codeblock >}}
+
+# 6.项目打包后的目录路径问题
+默认配置下，我们的项目只能在根目录下运行，将配置修改成以下这样就可以实现将项目打包到子目录了  
+{{< codeblock "config/index.js" "js" "" "js" >}}assetsPublicPath: './'
+{{< /codeblock >}}
+
+# 7.解决在v-html时，里面的元素无法继承外部css的问题
+v-html渲染的内容可以理解为其子组件内容，当style加上`scoped`属性时，就无法作用于v-html内绑定的内容。   
+ 
+        方法一：直接去除scoped属性  
+        方法二：在update()的生命周期内，通过js改变其css
+
+# 8.如何全局引入jquery 
+1. `$ cnpm install jquery --save`  
+
+2. 
+ {{< codeblock "build/webpack.base.conf.js" "js" "" "js" >}}var webpack = require("webpack")
+ //在module.exports的最后加入
+plugins: [
+    new webpack.optimize.CommonsChunkPlugin('common.js'),
+    new webpack.ProvidePlugin({
+        jQuery: "jquery",
+        $: "jquery"
+    })
+   ]
+{{< /codeblock >}} 
+3.  重启 `npm run dev`
+4. 
+ {{< codeblock "main.js" "js" "" "js" >}}import $ from 'jquery'
+{{< /codeblock >}}
+
+# 9.父子组件之间如何相互通信
+1. 父组件调用子组件的方法
+{{< codeblock "parent.vue" "js" "" "js" >}}<template>
+    <div>
+        <h1>我是父组件</h1>
+        <!-- 注意这里的ref -->
+        <child ref="child"></child>
+    </div>
+</template>
+<script>
+    import child from './child'
+
+    export default{
+        components:{ child },//别忘了components
+        methods:{
+            parent(){
+                this.$refs.child.childFn()
             }
-            };
-        },
-        props: {
-            items: {
-            type: Array,
-            required: true
-            }
-        },
-        methods: {
-            SetActive: function(event) {
-            this.isActive = !this.isActive;
-            },
-            SelectLi: function(val) {
-            this.selected.Name = val;
-            this.SetActive();
-            }
-        },
-        mounted:function(){
-            document.addEventListener('click', (e) => {
-                console.log(this.$el);
-                    if (!this.$el.contains(e.target)){
-                        this.isActive = false
-                    } 
-                });
-            }
-        };
-
-        ```css
-        .dropdown-wrapper {
-        position: relative;
-        display: inline-block;
-        margin-top: 20px;
-        margin-left: 20px;
         }
-        .dropdown-selected {
-        height: 36px;
-        line-height: 34px;
-        width: 120px;
-        border: 1px solid #afafaf;
-        padding-left: 10px;
-        &.show {
-            ~ .dropdown-list {
-            display: block;
+    }
+</script>
+{{< /codeblock >}}
+{{< codeblock "child.vue" "js" "" "js" >}}<template>
+    <div>
+       <h2>我是子组件</h2>
+    </div>
+</template>
+<script>
+    export default{
+        methods:{
+            childFn(){
+                alert('父组件调用了我')
             }
         }
-        }
-        .dropdown-list {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        background-color: #fff;
-        z-index: 1;
-        border: 1px solid #afafaf;
-        display: none;
-        > li {
-            height: 36px;
-            line-height: 36px;
-            padding-left: 10px;
-        }
-        }
-        ```  
+    }
+</script>
+{{< /codeblock >}}  
+2. 子组件调用父组件的方法
+{{< codeblock "parent.vue" "js" "" "js" >}}<template>
+    <div>
+        <h1>我是父组件</h1>
+        <child @parentFn="parent"></child>
+    </div>
+</template>
+<script>
+    import child from './child'
 
-2. 注册全局引用组件方法  
-      1. 引入组件  
-            `import Component from '' `  
-      2. 导出方法
-
-            ```js  
-            const Toast = {};
-
-            // 注册Toast
-            Toast.install = function (Vue) {
-                // 生成一个Vue的子类
-                // 同时这个子类也就是组件
-                const ToastConstructor = Vue.extend(Component)
-                // 生成一个该子类的实例
-                const instance = new ToastConstructor();
-
-                // 将这个实例挂载在新创建的div上
-                // 并将此div加入全局挂载点内部
-                instance.$mount(document.createElement('div'))
-                document.body.appendChild(instance.$el)
-
-                // 通过Vue的原型注册一个方法
-                // 让所有实例共享这个方法 
-                Vue.prototype.$toast = (msg, duration = 1500) => {
-                    instance.message = msg;
-                    instance.visible = true;
-
-                    setTimeout(() => {
-                        instance.visible = false;
-                    }, duration);
-                }
+    export default{
+        components:{ child },
+        methods:{
+            parent(){
+                //something
             }
-
-            export default Toast
-            ```  
-    
-    3. 在`main.js`文件内引用  
-       `import Toast from ''`  
-       `Vue.use(Toast)`
-    4. 在组件内无需import,直接`this.$toast("")`即可  
-  
-
-3. 只允许输入数字的组件  
-
-        ```js
-        <input type="text" v-number-only>  
-
-        export default{
-            directives: {
-                numberOnly: {
-                    bind: function(el) {
-                        el.handler = function() {
-                        el.value = el.value.replace(/\D+/, "");
-                        };
-                        el.addEventListener("input", el.handler);
-                    },
-                    unbind: function(el) {
-                        el.removeEventListener("input", el.handler);
-                    }
-                }
         }
+    }
+</script>
+{{< /codeblock >}}
+{{< codeblock "child.vue" "js" "" "js" >}}<template>
+    <div>
+       <h2>我是子组件</h2>
+    </div>
+</template>
+<script>
+    export default{
+        methods:{
+            childFn(){
+                this.$emit("parentFn");
+            }
         }
-        ```   
+    }
+</script>
+{{< /codeblock >}} 
 
-### 记录
-1. http请求  
+# 10.解决正常引入子组件报未注册组件错误的问题
+如下引入子组件：
+{{< codeblock "demo.vue" "js" "" "js" >}}<template>
+    <confirm-dialog></confirm-dialog>
+</template>
 
-    配置路由文件`router/config.js`  
-    跨域情况下不写  
+import { ConfirmDialog } from './dialogs';
+export default {
+    components: {
+    'confirm-dialog': ConfirmDialog,
+    },
+    ...
+};
+{{< /codeblock >}}  
+会报如下的组件未注册的错误：  
 
-        ```js
-        import axios from 'axios'
+    [Vue warn]: Unknown custom element: <modal-dialog> - did you register the component correctly? For recursive components, make sure to provide the "name" option.(found in <ConfirmDialog> at ...\src\components\global\dialogs\ConfirmDialog.vue)  
 
-        var pName = location.pathname.replace(/\/+/g, '/');
-        var id = pName.slice(0, pName.indexOf("/", 2));
-        axios.defaults.baseURL = id;
-        axios.defaults.withCredentials = true;
-
-        axios.interceptors.request.use(function (config) {
-            return config;
-        }, function (error) {
-            return Promise.reject(error);
-        });//请求拦截器
-
-        axios.interceptors.response.use(response => {
-            // 请求成功返回
-            //your code
-            return response;
-        }, (responseError) => {
-        });//响应拦截器
-        ```  
-        
-       在`main.js`文件中引入,`import config from './router/config'`  
-       发布时切换生产环境,`Vue.config.productionTip = true`
-
-        ```js  
-        import axios from 'axios'
-        import qs from 'qs'
-
-        export function Get(url, data) {
-            return new Promise((resolve, reject) => {
-                axios.get(url, {
-                    params: data
-                }).then((res) => {
-                    if (res) {
-                        if (res.status == 200) {
-                            resolve(res.data.data);
-                        } else {
-                            reject(res);
-                        }
-                    }
-                }).catch((error) => {
-                    reject(error);
-                })
-            });
-        }
-
-        export function Post(url, data) {
-            return new Promise((resolve, reject) => {
-                axios.post(url, qs.stringify(data), {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Accept': 'application/json'
-                    }
-                }).then((res) => {
-                    if (res) {
-                        if (res.status == 200) {
-                            resolve(res.data.data);
-                        } else {
-                            reject(res);
-                        }
-                    }
-                }).catch((error) => {
-                    reject(error);
-                })
-            });
-        }
-
-        export function PostFlie(url, data) {
-            return new Promise((resolve, reject) => {
-                //根据data对象生成FormData对象
-                var temp = new FormData();
-                for (var t in data) {
-                    temp.append(t, data[t]);
-                }
-                axios.post(url, temp).then((res) => {
-                    if (res.status == 200) {
-                        resolve(res.data.data);
-                    } else {
-                        reject(res);
-                    }
-                }).catch((error) => {
-                    reject(error);
-                })
-            })
-        }
-        ```
-        在service层只要引用相对路径就行
-
-        ```js  
-        import { Get, Post } from './http'
-
-        export function Interface(data) {
-            return Get('/url', data);
-        }
-        ```
-        组件内引用同样只需要相对路径
-
-        ```js
-        import { Interface } from "";
-
-        Interface(data).then(res => {});
-        ```
+解决方法是：  
+`import ConfirmDialog from './dialogs';`     
+去掉花括号即可 

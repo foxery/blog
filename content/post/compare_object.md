@@ -13,7 +13,7 @@ thumbnailImage: /img/cover.jpg
 
 <!--more-->
 ### 1. 比较对象
-两个js对象之间的比较,只能遍历其属性,一一对比。  
+两个js对象之间的比较,需要遍历其属性,一一对比。  
 
 ``` javascript
 function CompareObjectEqual(a, b) {
