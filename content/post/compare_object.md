@@ -12,11 +12,13 @@ thumbnailImage: /img/cover.jpg
 ---
 
 <!--more-->
-### 1. 比较对象
-两个js对象之间的比较,需要遍历其属性,一一对比。  
+我们都知道object是引用类型，无法用常规方式去比较。  
 
-``` javascript
-function CompareObjectEqual(a, b) {
+写这个主要是因为有这么一个需求：当某个接口被连续请求多次的时候，去判断前后两次请求的参数是否是一致的，如果一致，则忽略第二次请求，直至第一次请求成功返回。
+
+### 1. 遍历其属性,一一对比。  
+
+{{< codeblock "demo.js" "js" "" "" >}}function CompareObjectEqual(a, b) {
     if (!(a instanceof Object && b instanceof Object)) {
         return a === b;
     }
@@ -41,4 +43,8 @@ function CompareObjectEqual(a, b) {
 
     return true;
 }
-```  
+{{< /codeblock >}} 
+
+### 2. 转换成字符串
+{{< codeblock "demo.js" "js" "" "" >}}JSON.stringify(a)===JSON.stringify(b);
+{{< /codeblock >}} 

@@ -9,15 +9,14 @@ tags:
 - js
 keywords:
 - object
-thumbnailImage: /img/workday.jpg
+thumbnailImage: /img/plant.jpg
 ---
 
 <!--more-->
 ### 过程
 js中当new一个对象时,其过程到底是怎样的呢?  
 
-``` javascript
-  function Test() {};
+{{< codeblock "demo.js" "js" "" "" >}}function Test() {};
   var test = new Test();
   // new的过程
   var test = {};
@@ -25,10 +24,10 @@ js中当new一个对象时,其过程到底是怎样的呢?
   Test.call(this);
   test.__proto__ = Test.prototype;
   return test;
-```
+{{< /codeblock >}} 
 
 每个实例对象(不论是普通对象还是函数对象)都有__proto__的属性(用于指向创建它的函数对象的原型对象prototype,原型对象prototype中都有个预定义的constructor属性，用来引用它的函数对象,即`Test.prototype.constructor === Test;//true`),每个函数对象都有prototype的属性,类型是object,即一个引用对象  
-具体可参考!(https://segmentfault.com/a/1190000000532556)  
+具体可参考https://segmentfault.com/a/1190000000532556 
 
 1. 当JavaScript引擎执行new操作时,会马上开辟一个块内存,创建一个空对象test,并将this指向这个对象  
 2. 执行构造函数Test()，对这个空对象进行构造,将构造函数里的属性和方法都添加进去  

@@ -17,10 +17,7 @@ thumbnailImage: /img/carousel.png
 
 心血来潮,写了一个简单的轮播图插件,带有左右切换功能、底部导航功能、自动循环功能。代码如下:  
 
-js:  
-
-```javascript  
-(function () {
+{{< codeblock "carousel.js" "js" "" "" >}}(function () {
     $.Carousel = function (elem, options) {
         var curr = this;
         var contanier, navContanier, prevElem, nextElem, imgArry;
@@ -151,12 +148,9 @@ js:
         });
     };
 })();
-```  
+{{< /codeblock >}}
 
-css:  
-
-```javascript 
-* {
+{{< codeblock "carousel.css" "css" "" "" >}}* {
     box-sizing: border-box;
 }
 
@@ -265,12 +259,9 @@ ul>li {
 .carousel-nav>li+li {
     margin-left: 10px;
 }  
-```  
+{{< /codeblock >}}
 
-html:  
-
-```javascript
-<!DOCTYPE html>
+{{< codeblock "carousel.html" "xml" "" "" >}}<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -310,4 +301,4 @@ html:
 </body>
 
 </html>
-```
+{{< /codeblock >}}

@@ -226,9 +226,20 @@ export default{
 }
 {{< /codeblock >}}
 
-# 6.项目打包后的目录路径问题
-默认配置下，我们的项目只能在根目录下运行，将配置修改成以下这样就可以实现将项目打包到子目录了  
+# 6.项目打包后部署到服务器上打开一片空白,发现是文件引用路径错误问题
+默认配置下，通过webpack+vuecli默认打包的css、js等资源，路径都是绝对的。
+但当部署到带有文件夹的项目中，这种绝对路径就会出现问题，因为把配置的static文件夹当成了根路径，那么要解决这种问题，就得引用相对路径。  
+
+1. 资源相对引用路径
 {{< codeblock "config/index.js" "js" "" "js" >}}assetsPublicPath: './'
+{{< /codeblock >}}
+2. 背景图片的引用问题
+上面虽然解决了资源路径的引用问题，但是资源里面的背景图片，不像index.html中加载资源一样，通过./static/js/app.js引用可以正常加载，图片资源是通过css加载的，如`background: url("../../assets/images/logo.png");`被相对打包后变成了`url(static/img/logo.2f00bf2.png)`所以我们要保留css引用图片的正常路径，即`url(../../static/img/logo-.2f00bf2.png)`
+{{< codeblock "build/utils.js" "js" "" "js" >}}return ExtractTextPlugin.extract({
+    use: loaders,
+    fallback: 'vue-style-loader',
+    publicPath:'../../' //<--注意此处路径
+})
 {{< /codeblock >}}
 
 # 7.解决在v-html时，里面的元素无法继承外部css的问题
@@ -350,3 +361,60 @@ export default {
 解决方法是：  
 `import ConfirmDialog from './dialogs';`     
 去掉花括号即可 
+
+# 11.如何在js文件内使用vue-router进行路由跳转
+1. 以下是路由文件的内容
+{{< codeblock "router/index.js" "js" "" "js" >}}import Vue from 'vue';
+import Router from 'vue-router';
+
+Vue.use(Router);
+
+export default new Router({
+  routes: [
+    /* ... */
+  ],
+});
+{{< /codeblock >}}
+2. 把该路由文件引入到你的目标js文件中,你就可以使用路由了
+{{< codeblock "demo.js" "js" "" "js" >}}import router from "../router"
+
+function GoToPage(){
+    router.push("/");// <--- router
+}
+
+export default GoToPage
+{{< /codeblock >}}
+
+# 12.绑定事件中如何获取this（即触发事件的元素本身）
+1. 只获取当前事件元素，不包括其子元素
+{{< codeblock "demo.js" "js" "" "js" >}}<template>
+    <div>
+        <button @click="change($event)">点击事件</button>
+    </div>
+</template>
+<script>
+    export default{
+        methods:{
+            change(event){
+                console.log(event.target);
+            }
+        }
+    }
+</script>
+{{< /codeblock >}}
+2. 只获取当前事件元素，且包括其子元素
+{{< codeblock "demo.js" "js" "" "js" >}}<template>
+    <div>
+        <button @click="change($event)">点击事件</button>
+    </div>
+</template>
+<script>
+    export default{
+        methods:{
+            change(event){
+                console.log(event.currentTarget);
+            }
+        }
+    }
+</script>
+{{< /codeblock >}}
