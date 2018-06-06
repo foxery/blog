@@ -40,7 +40,7 @@ thumbnailImage: /img/profile.jpg
 }
 {{< /codeblock >}}
 
-# 3.js判断浏览类型，以及是否为手机端
+# 3.js判断浏览器类型，以及是否为手机端
 {{< codeblock "demo.js" "js" "" "" >}}var browser={
     versions:function(){
     var u = window.navigator.userAgent;
@@ -64,4 +64,27 @@ console.log(" ios终端: "+browser.versions.ios);
 console.log(" android终端: "+browser.versions.android);
 console.log(" 是否为iPhone: "+browser.versions.iPhone);
 console.log(" 是否iPad: "+browser.versions.iPad);
+{{< /codeblock >}}
+
+# 4.对接支付宝支付接口
+通过后台接口返回一串字符串形式的html表单，将它渲染到页面上，由于是异步渲染的表单，所以需要手动触发submit事件
+{{< codeblock "demo.vue" "js" "" "" >}}<template>
+    <div v-html="ZFBForm"></div>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                ZFBForm: null
+            };
+        },
+        mounted(){
+            this.ZFBForm = res;
+            this.$nextTick(() => {
+                document.forms["alipaysubmit"].submit();
+            });
+        }
+    }
+</script>
 {{< /codeblock >}}
