@@ -88,3 +88,9 @@ console.log(" 是否iPad: "+browser.versions.iPad);
     }
 </script>
 {{< /codeblock >}}
+
+# 5.打印html时自动分页
+在需要分页的地方加上以下css即可
+这个属性好像对原始table结构更友好些，不知为什么，在div结构内存在table时，使用此属性，会出现table的thead在tbody内出现多余重叠现象，原因不明
+{{< codeblock "demo.css" "css" "" "" >}}page-break-before:auto;
+page-break-after:always;{{< /codeblock >}}

@@ -62,3 +62,20 @@ $.on("touchend", function () {
 {{< codeblock "demo.css" "css" "" "" >}}* {
     -webkit-overflow-scrolling : touch;
 }{{< /codeblock >}}
+
+# 5.ios出于安全机制，不允许自动触发input的focus事件，只能用户触发
+
+# 6.解决 iphone下 input type="search" 弹出虚拟键盘 不能显示 搜索 问题
+在input 外面包裹一层form即可
+{{< codeblock "demo.js" "js" "" "" >}}<form action="javascript:return true;">       
+    <input name= "seach" type ="search"  placeholder=""/>
+</form>{{< /codeblock >}}
+
+在vue中监听手机点击键盘搜索按钮的事件，用`@keyup.enter`即可
+
+# 7.解决移动端点击image标签内的图片会放大预览图片问题
+{{< codeblock "demo.js" "js" "" "" >}}img.addEventListener('click',function(e){
+　　e.preventDefault();
+});{{< /codeblock >}}
+注意，这里click和touchend事件都可以，但是不可以是touchstart和touchmove事件  
+因为使用touchstart和touchmove事件的时候，假如页面顶部有个超级大的banner图，那么当横屏显示或者类似于ipad等屏幕宽度大于高度的情况下，整个banner图都占满了屏幕，这个时候页面没法滑动。因为你用touchstart和touchmove禁止掉了图片的默认行为，所以手指怎么滑动，页面都没反应的。刚好这个滑动的行为触发了touchstart和touchmove

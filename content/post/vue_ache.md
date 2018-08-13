@@ -418,3 +418,15 @@ export default GoToPage
     }
 </script>
 {{< /codeblock >}}
+
+# 13.使用axios拦截器统一处理所有的http请求和响应
+{{< codeblock "demo.js" "js" "" "js" >}}axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;';
+axios.interceptors.request.use((config) => {
+    if (config.url.indexOf('send_msgbynetease/img') < 0) {
+        config.data = qs.stringify(config.data);//此处需要引用 qs 用于处理上传图片接口时，需要将图片参数转换格式之后才能请求接口
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+{{< /codeblock >}}
