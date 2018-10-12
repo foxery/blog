@@ -430,3 +430,72 @@ axios.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 {{< /codeblock >}}
+
+# 14.使用路由回退时判断有没有上一个路由
+使用vue-router的`this.$router.go(-1)`可以返回到上一个路由  
+
+但在项目中，遇到了一个情况：  
+    正常情况下，当前页面可以点击topbar中的返回按钮回到上一页，但是若将这一页通过分享途径分享出去后，用户直接打开这一页，此时是不存在上一页的路由的。那这时要如何判断页面是否存在上一页呢？   
+
+尝试过使用`window.history.length是否小于等于1`来判断，但有时会出现window.history.length与实际情况不符  
+
+最后，我想到了一个办法：  
+{{< codeblock "demo.vue" "vue" "" "vue" >}}export default {
+  data: function() {
+      //是否存在上一页路由
+      hasLastRouter: false
+  },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      // 通过 `vm` 访问组件实例
+      if (from && from.name && from.fullPath !== "/") {
+        vm.hasLastRouter = true;
+      }
+    }); 
+  },
+  methods:{
+      back: function() {
+        if (this.hasLastRouter) {
+            this.$router.go(-1);
+        } else {
+            //没有上一页可以返回，做别的处理
+        }
+    }
+  }
+}
+{{< /codeblock >}}
+
+# 15.解决element-ui中upload组件使用多个时无法绑定对应的元素
+当只需要上传一次上传单张图片时，按照文档来基本没什么问题，但当需要以列表形式上传多张图片时，上传的图片控件就只对第一个有效了。如图所示：  
+![](/img/elementui_upload.png)  
+按照表格的上传图片需求，想要更改所要上传的图片，必然需要传图片的索引值，但是在el-upload 组件中的`:on-success="handleAdPicSuccess"`和 `:on-change="handleAdPicChange"`等这些方法中没有能传参的方式。
+因此，需要在执行这些方法前传递需要的参数，如下：
+{{< codeblock "demo.vue" "vue" "" "vue" >}}
+<template>
+    <div>
+        <el-table :data="tableData" size="mini">
+              <el-table-column label="缩略图" width="110">
+                <template slot-scope="scope">
+                  <el-upload :action="baseUrl+'/Index/uploadFile'" list-type="picture-card" name="File" :data="data" :limit="1" :on-success="(res,file,fileList)=>{return specImgSuccess(res,file,fileList, scope.$index)}">
+                    <i class="el-icon-plus"></i>
+                  </el-upload>
+                </template>
+              </el-table-column>
+        </el-table>
+    </div>
+</template>
+export default {
+  data: function() {
+      tableData: []
+  },
+  methods:{
+      specImgSuccess(response, file, fileList, index) {
+        this.tableData[index].img.push({
+            name: "",
+            url: response.Data.local,
+            fileName: response.Data.fileName
+        });
+    },
+  }
+}
+{{< /codeblock >}}

@@ -21,6 +21,8 @@ thumbnailImage: /img/camera.jpg
         window.android //需要安卓通过addJavascriptInterface定义一个接口，然后将name命名成android
 
 2. 通过userAgent判断  
+    
+   此方法在webview内就无法判断Android与ios，返回的userAgent是一样的
 
         const browser = {
             versions: function () {
@@ -79,3 +81,24 @@ $.on("touchend", function () {
 });{{< /codeblock >}}
 注意，这里click和touchend事件都可以，但是不可以是touchstart和touchmove事件  
 因为使用touchstart和touchmove事件的时候，假如页面顶部有个超级大的banner图，那么当横屏显示或者类似于ipad等屏幕宽度大于高度的情况下，整个banner图都占满了屏幕，这个时候页面没法滑动。因为你用touchstart和touchmove禁止掉了图片的默认行为，所以手指怎么滑动，页面都没反应的。刚好这个滑动的行为触发了touchstart和touchmove
+
+# 8.ios在调起微信支付后，无法自己返回到app的问题
+在ios的webview内，当发起微信支付成功后，无论是取消支付还是支付成功后，系统都会自动打开Safari，停留在浏览器内，无法自主返回到app内  
+
+webview内调起微信支付，是调用微信的H5支付接口，此时前端只需要将后台接口返回的data内url拼接后进行跳转处理即可
+{{< codeblock "demo.js" "js" "" "" >}}var payUrl=window.location.href;
+var url =data.mweb_url +"&redirect_url=" +encodeURIComponent(payUrl); //redirect_url后面的链接是支付调起后回跳的链接，需要进行编码
+window.location.href = url;
+{{< /codeblock >}}
+
+因此，需要在回跳的链接上加个参数，与ios端约定好一个协议，在回跳页面加载完成后判断是否存在这个参数，有的话就发起ios协议跳转到app  
+用vue来举例：
+{{< codeblock "demo.vue" "vue" "" "" >}}var payUrl=window.location.href+"?rouse=gcysuser://";
+var url =data.mweb_url +"&redirect_url=" +encodeURIComponent(payUrl); //redirect_url后面的链接是支付调起后回跳的链接，需要进行编码
+window.location.href = url;
+
+//在回跳页面的mounted钩子内
+if (this.$route.query && this.$route.query.rouse) {
+    window.location.href = this.$route.query.rouse;
+}
+{{< /codeblock >}}

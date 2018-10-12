@@ -93,4 +93,36 @@ console.log(" 是否iPad: "+browser.versions.iPad);
 在需要分页的地方加上以下css即可
 这个属性好像对原始table结构更友好些，不知为什么，在div结构内存在table时，使用此属性，会出现table的thead在tbody内出现多余重叠现象，原因不明
 {{< codeblock "demo.css" "css" "" "" >}}page-break-before:auto;
-page-break-after:always;{{< /codeblock >}}
+page-break-after:always;{{< /codeblock >}}  
+
+# 6.高分辨率移动端下，img与img衔接顶部会出现1px的空隙问题
+![](/img/1px.png)  
+{{< codeblock "demo.html" "html" "" "" >}}<img src="img1.jpg" alt="" class="full-img">
+<img src="img2.jpg" alt="" class="full-img">
+{{< /codeblock >}}
+{{< codeblock "demo.css" "css" "" "" >}}.full-img {
+  width: 100%;
+  display: block;
+}
+{{< /codeblock >}}  
+尝试了许多方法：
+1.{{< codeblock "demo.css" "css" "" "" >}}.full-img {
+  width: 100%;
+  line-height: 0;
+  vertical-align:top; // 或者bottom
+}
+{{< /codeblock >}}    
+2.在img外围包裹一个div，将div的`font-size`设为`0`
+
+都无效  
+
+最后只能加个`margin-top:-1px`来 hack 一下  
+{{< codeblock "demo.css" "css" "" "" >}}.full-img {
+  width: 100%;
+  display: block;
+  //hack 高分辨率手机下会出现img之间1px的间隙
+  margin-top: -1px;
+}
+{{< /codeblock >}}
+
+`不过话说回来，要解决两个inline-block元素之间的间距问题，将其父元素的font-size设为0真的很管用`

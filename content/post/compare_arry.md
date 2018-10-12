@@ -1,0 +1,129 @@
+---
+title: "比较数组是否相同以及如何排列组合多维数组"
+date: 2018-10-11T15:24:52+08:00
+categories:
+- technique
+- js
+tags:
+- arry
+keywords:
+- 相同数组
+- 多维数组组合排序
+thumbnailImage: /img/cover.jpg
+---
+
+<!--more-->
+
+<!-- toc -->
+# 1.比较两个数组是否相同  
+Javascript不能直接用==或者===来判断两个数组是否相等，因此需要将数组转换成字符串再做比较，但是数组内各元素的顺序不一定一致，所以只要排序后再转换即可。  
+{{< codeblock "demo.js" "js" "" "" >}}[1,2,3].sort().toString()== [3,2,1].sort().toString() //true
+{{< /codeblock >}}
+
+# 2.多维数组排列组合，两两组合成新数组
+项目中有遇到一个需求：现在有一批手机，其中颜色有［'白色','黑色','金色','粉红色'］；内存大小有［'16G','32G','64G','128G'］，版本有［'移动','联通','电信'］，要求写一个算法，实现［'白色,16G,移动', '白色,16G,联通' ...］这样的组合，允许后期再新增属性数组，例如再加一个［'国行','港版','美版'］。  
+{{< codeblock "demo.js" "js" "" "" >}}function permutations(arr) {
+      var len = arr.length;
+      // 当数组大于等于2个的时候
+      if (len >= 2) {
+        // 第一个数组的长度
+        var len1 = arr[0].length;
+        // 第二个数组的长度
+        var len2 = arr[1].length;
+        // 2个数组产生的组合数
+        var lenBoth = len1 * len2;
+        //  申明一个新数组,做数据暂存
+        var items = new Array(lenBoth);
+        // 申明新数组的索引
+        var index = 0;
+        // 2层嵌套循环,将组合放到新数组中
+        for (var i = 0; i < len1; i++) {
+          for (var j = 0; j < len2; j++) {
+            items[index] = arr[0][i] + "," + arr[1][j];
+            index++;
+          }
+        }
+        // 将新组合的数组并到原数组中
+        var newArr = new Array(len - 1);
+        for (var i = 2; i < arr.length; i++) {
+          newArr[i - 1] = arr[i];
+        }
+        newArr[0] = items;
+        // 执行回调
+        return permutations(newArr);
+      } else {
+        return arr[0];
+      }
+    }
+
+    var arr = [['a', 'b', 'c','d'], [1, 2, 3,4], ['x', 'y', 'z'],['魅族手机']];
+    console.log(permutations(arr));
+    // ["a,1,x,魅族手机", "a,1,y,魅族手机", "a,1,z,魅族手机", "a,2,x,魅族手机", "a,2,y,魅族手机", "a,2,z,魅族手机", "a,3,x,魅族手机", "a,3,y,魅族手机", "a,3,z,魅族手机", "a,4,x,魅族手机", "a,4,y,魅族手机", "a,4,z,魅族手机", "b,1,x,魅族手机", "b,1,y,魅族手机", "b,1,z,魅族手机", "b,2,x,魅族手机", "b,2,y,魅族手机", "b,2,z,魅族手机", "b,3,x,魅族手机", "b,3,y,魅族手机", "b,3,z,魅族手机", "b,4,x,魅族手机", "b,4,y,魅族手机", "b,4,z,魅族手机", "c,1,x,魅族手机", "c,1,y,魅族手机", "c,1,z,魅族手机", "c,2,x,魅族手机", "c,2,y,魅族手机", "c,2,z,魅族手机", "c,3,x,魅族手机", "c,3,y,魅族手机", "c,3,z,魅族手机", "c,4,x,魅族手机", "c,4,y,魅族手机", "c,4,z,魅族手机", "d,1,x,魅族手机", "d,1,y,魅族手机", "d,1,z,魅族手机", "d,2,x,魅族手机", "d,2,y,魅族手机", "d,2,z,魅族手机", "d,3,x,魅族手机", "d,3,y,魅族手机", "d,3,z,魅族手机", "d,4,x,魅族手机", "d,4,y,魅族手机", "d,4,z,魅族手机"]
+{{< /codeblock >}}
+
+此外，我还搜索到其他几种方法：
+{{< codeblock "demo.js" "js" "" "" >}}function doExchange(arr, depth){
+    for (var i = 0; i < arr[depth].length; i++) {
+        result[depth] = arr[depth][i]
+        if (depth != arr.length - 1) {
+            doExchange(arr, depth + 1)
+        } else {
+            results.push(result.join(','))
+        }
+    }
+}
+
+function test(arr){
+    results = [];
+    result = [];
+    doExchange(arr, 0);
+}
+
+var garr = [
+        ['a', 'b', 'c'],
+        ['1', '2', '3'],
+        ['x', 'y', 'z'],
+    ];
+test(garr);
+
+console.log(results);
+//["a,1,x", "a,1,y", "a,1,z", "a,2,x", "a,2,y", "a,2,z", "a,3,x", "a,3,y", "a,3,z", "b,1,x", "b,1,y", "b,1,z", "b,2,x", "b,2,y", "b,2,z", "b,3,x", "b,3,y", "b,3,z", "c,1,x", "c,1,y", "c,1,z", "c,2,x", "c,2,y", "c,2,z", "c,3,x", "c,3,y", "c,3,z"]
+{{< /codeblock >}}
+{{< codeblock "demo.js" "js" "" "" >}}function doExchange(arr){
+        var len = arr.length;
+        // 当数组大于等于2个的时候
+        if(len >= 2){
+            // 第一个数组的长度
+            var len1 = arr[0].length;
+            // 第二个数组的长度
+            var len2 = arr[1].length;
+            // 2个数组产生的组合数
+            var lenBoth = len1 * len2;
+            //  申明一个新数组,做数据暂存
+            var items = new Array(lenBoth);
+            // 申明新数组的索引
+            var index = 0;
+            // 2层嵌套循环,将组合放到新数组中
+            for(var i=0; i<len1; i++){
+                for(var j=0; j<len2; j++){
+                    items[index] = arr[0][i] +","+ arr[1][j];
+                    index++;
+                }
+            }
+            // 将新组合的数组并到原数组中
+            var newArr = new Array(len -1);
+            for(var i=2;i<arr.length;i++){
+                newArr[i-1] = arr[i];
+            }
+            newArr[0] = items;
+            // 执行回调
+            return doExchange(newArr);
+        }else{
+            return arr[0];
+        }
+    }
+
+    var array = [['a', 'b', 'c'], [1, 2, 3], ['x', 'y', 'z']];
+    doExchange(array);
+    //["a,1,x", "a,1,y", "a,1,z", "a,2,x", "a,2,y", "a,2,z", "a,3,x", "a,3,y", "a,3,z", "b,1,x", "b,1,y", "b,1,z", "b,2,x", "b,2,y", "b,2,z", "b,3,x", "b,3,y", "b,3,z", "c,1,x", "c,1,y", "c,1,z", "c,2,x", "c,2,y", "c,2,z", "c,3,x", "c,3,y", "c,3,z"]
+{{< /codeblock >}}
