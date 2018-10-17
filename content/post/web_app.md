@@ -102,3 +102,15 @@ if (this.$route.query && this.$route.query.rouse) {
     window.location.href = this.$route.query.rouse;
 }
 {{< /codeblock >}}
+
+# 9.如何使在vue内需要引用的文件不进行编译压缩
+在与app交互中，遇到一个需求，前端需要调起app端的分享功能，当前端发起一份分享协议给app时，app需要请求我这边的接口以此获取需要分享的信息内容。但是发现，如果在src项目内部引用，js文件会被编译压缩，app端就找不到我这边的接口，因为此时接口已经被编译成类似于`a()`这种形式。
+
+其实要解决这个问题很简单，通过vue-cli构建的项目中，与src同级的还有一个`static`文件夹，将js文件放在这里，就不会被编译压缩，然后在`index.html`内直接引用即可。
+
+{{< codeblock "index.html" "html" "" "html" >}}...
+<div id="app"></div>
+
+<script type="text/javascript" src="static/js/share.js"></script>
+...
+{{< /codeblock >}}
