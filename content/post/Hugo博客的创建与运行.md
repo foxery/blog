@@ -45,7 +45,7 @@ $ echo 'theme = "ananke"' >> config.toml`
 `$ hugo server -D`  
 
 ### 四、创建文章  
-`$ hugo new blog/your-project-name.md`  
+`$ hugo new post/your-project-name.md`  
 
 ### 五、部署
  `$ cd your_project_name`  
