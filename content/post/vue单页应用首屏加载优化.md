@@ -106,7 +106,10 @@ Vue.use(Router)
 {{< codeblock "store/index.js" "js" "" "js" >}}//import Vue from 'vue';
 //import Vuex from 'vuex';
 
-//Vue.use(Vuex)
+if (process.env.NODE_ENV === 'development') {
+    //开发环境没有的话会报错
+    Vue.use(Vuex)
+}
 
 //router/index.js
 //import Router from 'vue-router'

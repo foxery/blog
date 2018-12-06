@@ -33,7 +33,7 @@ thumbnailImage: /img/cover3.jpg
     3. `cnpm install`  
         因为自动构建过程中已存在package.json文件，所以这里直接安装依赖就行
     4. `cnpm install vue-router vue-resource --save`  
-        安装 vue 路由模块 vue-router 和网络请求模块 vue-resource
+        安装 vue 路由模块 vue-router 和网络请求模块 vue-resource(现在的脚手架会自动安装vue-router，所以这一步可以省略)
     5. `npm run dev`  
         启动项目
 

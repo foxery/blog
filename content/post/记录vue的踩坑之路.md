@@ -226,7 +226,7 @@ export default{
 }
 {{< /codeblock >}}
 
-# 6.项目打包后部署到服务器上打开一片空白,发现是文件引用路径错误问题
+# 8.项目打包后部署到服务器上打开一片空白,发现是文件引用路径错误问题
 默认配置下，通过webpack+vuecli默认打包的css、js等资源，路径都是绝对的。
 但当部署到带有文件夹的项目中，这种绝对路径就会出现问题，因为把配置的static文件夹当成了根路径，那么要解决这种问题，就得引用相对路径。  
 
@@ -242,13 +242,13 @@ export default{
 })
 {{< /codeblock >}}
 
-# 7.解决在v-html时，里面的元素无法继承外部css的问题
+# 9.解决在v-html时，里面的元素无法继承外部css的问题
 v-html渲染的内容可以理解为其子组件内容，当style加上`scoped`属性时，就无法作用于v-html内绑定的内容。   
  
         方法一：直接去除scoped属性  
         方法二：在update()的生命周期内，通过js改变其css
 
-# 8.如何全局引入jquery 
+# 10.如何全局引入jquery 
 1. `$ cnpm install jquery --save`  
 
 2. 
@@ -267,7 +267,7 @@ plugins: [
  {{< codeblock "main.js" "js" "" "js" >}}import $ from 'jquery'
 {{< /codeblock >}}
 
-# 9.父子组件之间如何相互通信
+# 11.父子组件之间如何相互通信
 1. 父组件调用子组件的方法
 {{< codeblock "parent.vue" "js" "" "js" >}}<template>
     <div>
@@ -340,7 +340,7 @@ plugins: [
 </script>
 {{< /codeblock >}} 
 
-# 10.解决正常引入子组件报未注册组件错误的问题
+# 12.解决正常引入子组件报未注册组件错误的问题
 如下引入子组件：
 {{< codeblock "demo.vue" "js" "" "js" >}}<template>
     <confirm-dialog></confirm-dialog>
@@ -362,7 +362,7 @@ export default {
 `import ConfirmDialog from './dialogs';`     
 去掉花括号即可 
 
-# 11.如何在js文件内使用vue-router进行路由跳转
+# 13.如何在js文件内使用vue-router进行路由跳转
 1. 以下是路由文件的内容
 {{< codeblock "router/index.js" "js" "" "js" >}}import Vue from 'vue';
 import Router from 'vue-router';
@@ -385,7 +385,7 @@ function GoToPage(){
 export default GoToPage
 {{< /codeblock >}}
 
-# 12.绑定事件中如何获取this（即触发事件的元素本身）
+# 14.绑定事件中如何获取this（即触发事件的元素本身）
 1. 只获取当前事件元素，不包括其子元素
 {{< codeblock "demo.js" "js" "" "js" >}}<template>
     <div>
@@ -419,7 +419,7 @@ export default GoToPage
 </script>
 {{< /codeblock >}}
 
-# 13.使用axios拦截器统一处理所有的http请求和响应
+# 15.使用axios拦截器统一处理所有的http请求和响应
 {{< codeblock "demo.js" "js" "" "js" >}}axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;';
 axios.interceptors.request.use((config) => {
     if (config.url.indexOf('send_msgbynetease/img') < 0) {
@@ -431,7 +431,7 @@ axios.interceptors.request.use((config) => {
 });
 {{< /codeblock >}}
 
-# 14.使用路由回退时判断有没有上一个路由
+# 16.使用路由回退时判断有没有上一个路由
 使用vue-router的`this.$router.go(-1)`可以返回到上一个路由  
 
 但在项目中，遇到了一个情况：  
@@ -465,7 +465,7 @@ axios.interceptors.request.use((config) => {
 }
 {{< /codeblock >}}
 
-# 15.解决element-ui中upload组件使用多个时无法绑定对应的元素
+# 17.解决element-ui中upload组件使用多个时无法绑定对应的元素
 当只需要上传一次上传单张图片时，按照文档来基本没什么问题，但当需要以列表形式上传多张图片时，上传的图片控件就只对第一个有效了。如图所示：  
 ![](/img/elementui_upload.png)  
 按照表格的上传图片需求，想要更改所要上传的图片，必然需要传图片的索引值，但是在el-upload 组件中的`:on-success="handleAdPicSuccess"`和 `:on-change="handleAdPicChange"`等这些方法中没有能传参的方式。
