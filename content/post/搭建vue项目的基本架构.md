@@ -151,4 +151,208 @@ new HtmlWebpackPlugin({
 {{< /codeblock >}}
     将`import`路由的方式改成`const HelloWorld = r => require.ensure([], () => r(require('@/components/HelloWorld')), 'HelloWorld')`就可以实现按需加载了  
 
-# 7.引入sass    
+# 7.引入sass
+具体请看[这里](https://foxery.github.io/2018/02/%E8%AE%B0%E5%BD%95vue%E7%9A%84%E8%B8%A9%E5%9D%91%E4%B9%8B%E8%B7%AF%E4%BB%A5%E5%8F%8A%E7%BB%8F%E9%AA%8C%E5%88%86%E4%BA%AB/#5-%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8sass)
+
+# 8.使用vuex
+1. 安装vuex  
+  `npm i vuex --save`  
+2. 构建store目录结构   
+  在`src`文件夹下，新建一个`store`文件夹，目录结构如下：
+
+  ```  
+  +-- store
+  |   +-- index.js //入口文件
+  |   +-- actions.js
+  |   +-- getters.js
+  |   +-- mutations.js
+  |   +-- rootState.js
+
+  ```  
+
+{{< codeblock "store/index.js" "js" "" "js" >}}import Vue from 'vue';
+import Vuex from 'vuex';
+import * as actions from './actions';
+import * as mutations from './mutations';
+import * as getters from './getters';
+import state from './rootState';
+
+if (process.env.NODE_ENV === 'development') {
+    Vue.use(Vuex)
+}
+
+const store = new Vuex.Store({
+    state,
+    getters,
+    actions,
+    mutations
+})
+export default store;
+{{< /codeblock >}}
+{{< codeblock "store/actions.js" "js" "" "js" >}}export const recordTop = ({ commit }) => {
+  commit({
+    type: 'getTop',     //对应mutation.js中的getTop方法
+    top: 100
+  });
+};
+{{< /codeblock >}}
+{{< codeblock "store/getters.js" "js" "" "js" >}}export const top = state => state.top;
+{{< /codeblock >}}
+{{< codeblock "store/mutations.js" "js" "" "js" >}}export const getTop = (state, payload) => {
+  state.top = payload.top;
+}
+{{< /codeblock >}}
+{{< codeblock "store/rootState.js" "js" "" "js" >}}const state = {
+    top: 0
+}
+export default state;
+{{< /codeblock >}}
+3. 引入
+{{< codeblock "main.js" "js" "" "js" >}}...
+import store from './store/index';
+...
+new Vue({
+  el: '#app',
+  router,
+  store,
+  components: { App },
+  template: '<App/>'
+})
+{{< /codeblock >}}  
+
+# 9.使用axios
+1. 安装axios  
+`npm i axios --save` 
+
+2. 封装http请求  
+  在`src`文件夹下，新建一个`service`文件夹，目录结构如下：
+
+  ```  
+  +-- service
+  |   +-- http.js
+  |   +-- request.js
+
+  ```  
+  {{< codeblock "service/http.js" "js" "" "js" >}}import axios from 'axios'
+  import qs from 'qs'
+
+  export function Get(url, data) {
+      return new Promise((resolve, reject) => {
+          axios.get(url, {
+              params: data
+          }).then((res) => {
+              if (res) {
+                  if (res.status == 200) {
+                      if (res.data.status == 1) {
+                          resolve(res.data.data);
+                      } else {
+                          reject(res.data.msg);
+                      }
+                  } else {
+                      reject(res);
+                  }
+              }
+          }).catch((res) => {
+              reject(res);
+          });
+      });
+  }
+
+  export function Post(url, data) {
+      return new Promise((resolve, reject) => {
+          axios.post(url, qs.stringify(data)).then((res) => {
+              if (res) {
+                  if (res.status == 200) {
+                      if (res.data.status == 1) {
+                          resolve(res.data.data);
+                      }
+                      else {
+                          reject(res.data.msg);
+                      }
+                  } else {
+                      reject(res);
+                  }
+              }
+          }).catch((res) => {
+              reject(res);
+          });
+      });
+  }
+
+  export function PostFlie(url, data) {
+      return new Promise((resolve, reject) => {
+          //根据data对象生成FormData对象
+          var temp = new FormData();
+          for (var t in data) {
+              temp.append(t, data[t]);
+          }
+          axios.post(url, temp).then((res) => {
+              if (res.status == 200) {
+                  resolve(res.data.data);
+              } else {
+                  reject(res);
+              }
+          }).catch((res) => {
+              reject(res);
+          });
+      })
+  }
+  {{< /codeblock >}}
+  {{< codeblock "service/request.js" "js" "" "js" >}}import { Get, Post } from './http'
+
+  //举例
+  export function Request() {
+      return Post(API_HOST + '/request', {});
+  }
+  {{< /codeblock >}}  
+3. 添加axios拦截器  
+{{< codeblock "main.js" "js" "" "js" >}}...
+import axios from 'axios'
+...
+// 添加请求拦截器
+axios.interceptors.request.use(function (config) {
+  // 在发送请求之前做些什么
+  return config;
+}, function (error) {
+  // 对请求错误做些什么
+  return Promise.reject(error);
+});
+
+// 添加响应拦截器
+axios.interceptors.response.use(function (response) {
+  // 对响应数据做点什么
+  return response;
+}, function (error) {
+  // 对响应错误做点什么
+  return Promise.reject(error);
+});
+{{< /codeblock >}}  
+
+# 总结  
+
+  ```  
+  +-- store
+  |   +-- index.js
+  |   +-- actions.js
+  |   +-- getters.js
+  |   +-- mutations.js
+  |   +-- rootState.js
+  +-- service
+  |   +-- http.js
+  |   +-- request.js
+  +-- router
+  |   +-- index.js
+  +-- util
+  |   +-- toast.js
+  +-- views
+  |   +-- page1.vue
+  +-- components
+  |   +-- toast.vue
+  +-- assets
+  |   +-- sass
+      |   +-- normalize.scss
+  |   +-- img
+
+  ```  
+  以上，一个基本的项目结构就完成了。  
+  日后想要新建一个vue项目，可以直接用[这个项目](https://github.com/foxery/vue-base)
