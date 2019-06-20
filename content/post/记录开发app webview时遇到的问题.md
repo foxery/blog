@@ -114,3 +114,23 @@ if (this.$route.query && this.$route.query.rouse) {
 <script type="text/javascript" src="static/js/share.js"></script>
 ...
 {{< /codeblock >}}
+
+# 10.关于new Date()转换时间在iOS中不生效问题  
+js中使用`new Date('2019-06-20 23:59:59').getTime()`，Android端正常转换，但是在ios端没有正确转换成时间戳。  
+原因是ios端不支持这种时间格式。  
+将时间格式转换成`'2019/06/20 23:59:59'`即可  
+
+# 11.关于input输入框在iOS中获取到焦点之后界面上移无法回落问题
+在ios端，会遇到input输入框获取到焦点之后，软键盘自动顶起界面，但是失去焦点之后无法回落的问题  
+
+解决方法如下：  
+{{< codeblock "demo.js" "js" "" "js" >}}const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
+
+window.scrollTo(0, Math.max(scrollHeight - 1, 0));
+{{< /codeblock >}}  
+
+# 12.canvas在移动端出现锯齿的问题  
+原因应该是手机的宽度是720像素的, 而canvas是按照小于720像素画出来的, 所以在720像素的手机上显示时, 这个canvas的内容其实是经过拉伸的, 所以会出现模糊和锯齿。  
+
+解决方法是：  
+在canvas标签中设置了`width="200",height="200"`之外, 还需要在canvas标签上设置`style="width:100%;"`

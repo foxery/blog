@@ -245,8 +245,23 @@ export default{
 # 9.解决在v-html时，里面的元素无法继承外部css的问题
 v-html渲染的内容可以理解为其子组件内容，当style加上`scoped`属性时，就无法作用于v-html内绑定的内容。   
  
-        方法一：直接去除scoped属性  
-        方法二：在update()的生命周期内，通过js改变其css
+1. 方法一：直接去除scoped属性  
+2. 方法二：在update()的生命周期内，通过js改变其css  
+3. 方法三：如果不想去掉scoped属性，可以使用`>>>`操作符(深度作用选择器)，顾名思义，它可以深度影响子组件的样式。例如：  
+
+{{< codeblock "demo.css" "css" "" "css" >}}.demo-tabs-style2>>>.ivu-tabs.ivu-tabs-card > .ivu-tabs-bar .ivu-tabs-tab{
+    border-radius: 0;
+    background: #eeee00;
+}
+{{< /codeblock >}}  
+ 4. 在sass之类的预处理器内，则使用`/deep/`操作符取而代之。例如：
+{{< codeblock "demo.scss" "css" "" "css" >}}.demo-tabs-style2 {
+  /deep/ .ivu-tabs.ivu-tabs-card {
+    border-radius: 0;
+    background: #eeee00;
+  }
+}
+{{< /codeblock >}}  
 
 # 10.如何全局引入jquery 
 1. `$ cnpm install jquery --save`  
@@ -498,4 +513,21 @@ export default {
     },
   }
 }
-{{< /codeblock >}}
+{{< /codeblock >}}  
+
+# 18.在data()中如何引用本地静态图片  
+当需要在vue的data()中引用本地静态图片时，项目结构如下图所示：
+![](/img/vue_img_import.jpg)  
+
+{{< codeblock "demo.js" "js" "" "js" >}}<img :src="item.url" v-for="item in list"/>  
+data(){
+    list:[
+        {
+            url: require("../../../static/app/img/activity/doctor_img_01.jpg")
+        }
+    ]
+}
+{{< /codeblock >}}   
+
+# 19.添加/修改数组/对象的属性值，没有触发视图更新的问题  
+使用`this.$set(object, "属性值", 赋值内容);`即可
