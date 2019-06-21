@@ -1,5 +1,5 @@
 ---
-title: "混合开发中与app的交互问题"
+title: "混合开发中与app的交互方案"
 date: 2019-02-21T10:25:24+08:00
 categories:
 - technique

@@ -133,4 +133,67 @@ window.scrollTo(0, Math.max(scrollHeight - 1, 0));
 原因应该是手机的宽度是720像素的, 而canvas是按照小于720像素画出来的, 所以在720像素的手机上显示时, 这个canvas的内容其实是经过拉伸的, 所以会出现模糊和锯齿。  
 
 解决方法是：  
-在canvas标签中设置了`width="200",height="200"`之外, 还需要在canvas标签上设置`style="width:100%;"`
+在canvas标签中设置了`width="200",height="200"`之外, 还需要在canvas标签上设置`style="width:100%;"`  
+
+# 13.ios端webview内，当A页面滚动超过一屏后跳转到B页面，再返回A页面时会出现局部区域被遮盖的情况  
+
+1. 出现步骤  
+    1.  
+{{< codeblock "app.vue" "vue" "" "vue" >}}<template>
+  <div id="app">
+    <router-view></router-view>
+  </div>
+</template>
+
+<style>
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+#app{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+}
+</style>
+{{< /codeblock >}}  
+
+    2. 在ios端webview内访问A页面，滚动超过一屏后跳转到B页面，再返回A页面时，会出现如下情况(黄色部分就是被遮盖部分)：  
+    ![](/img/ios_back.png)  
+    3.点击页面或者继续进行滚动操作后，页面才会恢复正常  
+
+2. 猜测原因  
+因为设置html、body高度是100%，从而造成了 #app 撑开父级，但浏览器默认滚动的scroll是body，当使用go history (-1)时，无法复原     
+
+3. 解决方案   
+让 #app 重新成为scroll的对象 
+{{< codeblock "app.vue" "vue" "" "vue" >}}<template>
+  <div id="app">
+    <router-view></router-view>
+  </div>
+</template>
+
+<style>
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+#app{
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+  position: absolute;
+  left:0;
+  top:0;
+}
+</style>
+{{< /codeblock >}} 
