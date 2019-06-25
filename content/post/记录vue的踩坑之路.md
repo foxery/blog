@@ -283,7 +283,7 @@ plugins: [
 {{< /codeblock >}}
 
 # 11.父子组件之间如何相互通信
-1. 父组件调用子组件的方法
+## 1. 父组件直接调用子组件的方法
 {{< codeblock "parent.vue" "js" "" "js" >}}<template>
     <div>
         <h1>我是父组件</h1>
@@ -319,7 +319,7 @@ plugins: [
     }
 </script>
 {{< /codeblock >}}  
-2. 子组件调用父组件的方法
+## 2. 子组件直接调用父组件的方法
 {{< codeblock "parent.vue" "js" "" "js" >}}<template>
     <div>
         <h1>我是父组件</h1>
@@ -354,6 +354,90 @@ plugins: [
     }
 </script>
 {{< /codeblock >}} 
+## 3. 多级父子组件通信
+多层级父子组件之间通信，一级一级向上传递参数太繁琐，这时可以通过`while`等循环，不断向上遍历，直到找到目标父组件，就在对应的组件上触发事件。  
+1.  
+{{< codeblock "src/mixins/emitter.js" "js" "" "js" >}}function broadcast(componentName, eventName, params) {
+  this.$children.forEach(child => {
+    var name = child.$options.componentName;
+
+    if (name === componentName) {
+      child.$emit.apply(child, [eventName].concat(params));
+    } else {
+      broadcast.apply(child, [componentName, eventName].concat([params]));
+    }
+  });
+}
+export default {
+  methods: {
+    dispatch(componentName, eventName, params) {
+      var parent = this.$parent || this.$root;
+      var name = parent.$options.componentName;
+
+      while (parent && (!name || name !== componentName)) {
+        parent = parent.$parent;
+
+        if (parent) {
+          name = parent.$options.componentName;
+        }
+      }
+      if (parent) {
+        parent.$emit.apply(parent, [eventName].concat(params));
+      }
+    },
+    broadcast(componentName, eventName, params) {
+      broadcast.call(this, componentName, eventName, params);
+    }
+  }
+};
+{{< /codeblock >}}   
+2. 定义两个嵌套的组件 f1.vue 和 c1.vue 、c2.vue 
+{{< codeblock "child.vue" "js" "" "js" >}} <f1>
+   <c1>
+    <c2></c2>
+   </c1>
+ </f1>
+{{< /codeblock >}}
+{{< codeblock "c2.vue" "vue" "" "vue" >}} <template>
+     <section>
+     <button type="button" name="button" @click="dispatchTest">点击一下，就可以</button>
+   </section>
+ </template>
+<script type="text/javascript">
+    import Emitter from "../mixins/emitter";
+    export default {
+        name: "c2",
+        mixins: [Emitter],
+        componentName:'c2',
+        methods: {
+        dispatchTest() {
+            this.dispatch('f1', 'listenerToC1', false);
+            }
+        }
+    }
+</script>
+{{< /codeblock >}}
+{{< codeblock "f1.vue" "vue" "" "vue" >}}<template type="html">
+  <div class="outBox-class">
+    <slot>
+    </slot>
+  </div>
+</template>
+
+<script type="text/javascript">
+import Emitter from "../mixins/emitter";
+export default {
+    name: "f1",
+    mixins: [Emitter],
+    componentName: 'f1',
+    mounted() {
+        this.$on("listenerToC1", (value) => {
+            alert(value);
+        })
+    }
+}
+</script>
+{{< /codeblock >}}
 
 # 12.解决正常引入子组件报未注册组件错误的问题
 如下引入子组件：
@@ -528,6 +612,7 @@ data(){
     ]
 }
 {{< /codeblock >}}   
+在`css`中的`background-image`属性引用背景图片时也一样 
 
 # 19.添加/修改数组/对象的属性值，没有触发视图更新的问题  
 使用`this.$set(object, "属性值", 赋值内容);`即可
