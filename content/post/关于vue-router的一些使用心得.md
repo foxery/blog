@@ -2,12 +2,13 @@
 title: "关于vue-router的一些使用心得"
 date: 2018-06-07T11:45:40+08:00
 categories:
-- technique
+- program
 - vue
 tags:
 - vue-router
 keywords:
-- vue-router
+- watch
+- title
 thumbnailImage: /img/cover2.jpg
 ---
 

@@ -2,13 +2,13 @@
 title: "mpvue开发微信小程序时遇到的问题"
 date: 2019-06-20T14:31:47+08:00
 categories:
-- category
-- vue
-tags:
+- problem
 - mpvue
+tags:
+- input
 - 微信小程序
 keywords:
-- tech
+- input v-model
 #thumbnailImage: //example.com/image.jpg
 ---
 

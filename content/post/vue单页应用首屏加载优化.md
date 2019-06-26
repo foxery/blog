@@ -2,10 +2,9 @@
 title: "vue单页应用首屏加载优化"
 date: 2018-10-17T10:10:17+08:00
 categories:
-- technique
+- program
 - vue
 tags:
-- vue
 - optimization
 keywords:
 - 首屏优化

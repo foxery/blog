@@ -2,12 +2,14 @@
 title: "解决在微信浏览器内使用vue Router进行跳转时ios端url未改变的问题"
 date: 2018-11-27T17:05:19+08:00
 categories:
-- technique
+- problem
 - vue
 tags:
 - vue-router
-- wechat
+- 微信公众号
+- ios
 keywords:
+- ios
 - 路由跳转
 #thumbnailImage: //example.com/image.jpg
 ---

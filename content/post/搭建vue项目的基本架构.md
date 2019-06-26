@@ -2,14 +2,18 @@
 title: "搭建vue项目的基本架构"
 date: 2018-12-06T14:36:33+08:00
 categories:
-- technique
+- build
 - vue
 tags:
-- vue
-- architecture
+- 项目架构
 keywords:
-- vue
-- architecture
+- vue-cli
+- 环境配置
+- gzip
+- 按需加载
+- sass
+- vuex
+- axios
 #thumbnailImage: //example.com/image.jpg
 ---
 

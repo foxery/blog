@@ -2,10 +2,9 @@
 title: "解决移动端ios滚动穿透的问题"
 date: 2018-11-27T15:25:26+08:00
 categories:
-- technique
+- problem
 - vue
 tags:
-- vue
 - ios
 keywords:
 - 滚动穿透
