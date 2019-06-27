@@ -2,12 +2,12 @@
 title: "如何调试app webview"
 date: 2018-05-31T17:06:06+08:00
 categories:
-- technique
+- program
 - webview
 tags:
-- webview
+- 调试
 keywords:
-- debugging
+- 调试
 thumbnailImage: /img/default.jpg
 ---
 

@@ -2,7 +2,7 @@
 title: "记录vue的踩坑之路以及经验分享"
 date: 2018-02-07T10:14:19+08:00
 categories:
-- technique
+- problem
 - vue
 tags:
 - vue

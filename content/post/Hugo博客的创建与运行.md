@@ -2,10 +2,10 @@
 title: "Hugo博客的创建与运行"
 date: 2018-02-07T10:10:49+08:00
 categories:
-- technique
+- build
 - blog
 tags:
-- 博客
+- hugo
 keywords:
 - hugo
 thumbnailImage: /img/cover1.jpg

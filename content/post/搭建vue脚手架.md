@@ -2,10 +2,9 @@
 title: "搭建vue脚手架"
 date: 2018-02-07T10:13:59+08:00
 categories:
-- technique
+- build
 - vue
 tags:
-- vue
 - vue-cli
 keywords:
 - vue-cli

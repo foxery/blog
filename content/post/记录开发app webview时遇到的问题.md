@@ -2,7 +2,7 @@
 title: "记录开发app webview时遇到的问题"
 date: 2018-02-27T17:27:47+08:00
 categories:
-- technique
+- problem
 - webview
 tags:
 - webview
